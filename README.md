@@ -163,3 +163,137 @@ export default App;
 ---
 ![Menjalankan Halaman Sederhana](images/simple_page.png)
 ---
+
+---
+# 📌 Praktikum Pekan 4 – Menghubungkan React ke Flask
+
+## 📄 Deskripsi Singkat
+Pada tahap ini, mahasiswa akan mempelajari cara memanggil API Flask dari React. Tujuannya adalah agar frontend dapat menampilkan data yang didapat dari backend.
+
+## 🎯 Tujuan Pembelajaran
+- Mahasiswa memahami konsep fetching data di React.
+- Mahasiswa dapat membuat permintaan (GET) ke API Flask dan menampilkannya di React.
+
+## 🛠️ Langkah-Langkah Praktikum
+
+### preparation
+Install flask-cors kedalam backend, masuk ke backend terlebih dahulu dengan
+
+```sh
+cd backend
+```
+
+lalu jalankan kode
+
+```sh
+pip install flask-cors
+```
+
+import library flask-cors di `app.py` hasil akhirnya seperti berikut:
+
+```python
+from flask import Flask, jsonify
+from flask_cors import CORS
+
+app = Flask(__name__)
+
+CORS(app)
+```
+
+### 1️⃣ Menambahkan Endpoint di Flask
+Tambahkan endpoint berikut di `app.py`:
+```python
+@app.route('/api/data')
+def get_data():
+    return jsonify({"data": "Hello from Flask API"})
+```
+Penting: Pastikan fungsi `get_data()` didefinisikan di atas blok berikut dalam `app.py`:
+```python
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5000)
+```
+
+Kode lengkap `app.py` harus seperti ini:
+```python
+from flask import Flask, jsonify
+from flask_cors import CORS
+
+app = Flask(__name__)
+
+CORS(app)
+
+@app.route('/')
+def home():
+    return jsonify({"message": "Hello from Flask!"})
+
+@app.route('/api/data')
+def get_data():
+    return jsonify({"data": "Hello from Flask API"})
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5000)
+```
+
+### 2️⃣ Menjalankan Flask
+Pastikan Anda berada dalam virtual environment. Jika belum aktif, kita buka directory backend terlebih dahulu
+
+```sh
+cd backend
+```
+
+lalu jalankan perintah berikut:
+
+```sh
+.\venv\Scripts\activate
+```
+
+Jalankan server Flask dengan perintah:
+
+```sh
+python app.py
+```
+
+![Terminal flask](images/terminal_flask.png)
+
+Pastikan endpoint dapat diakses di `http://localhost:5000/api/data`.
+
+![Run Flask](images/run_flask_api.png)
+
+### 3️⃣ Memanggil Endpoint dari React
+Buka `src/App.jsx` pada proyek React dan ganti kontennya dengan kode berikut:
+```jsx
+import React, { useState, useEffect } from 'react';
+
+function App() {
+  const [apiData, setApiData] = useState(null);
+
+  useEffect(() => {
+    fetch('http://localhost:5000/api/data')
+      .then(response => response.json())
+      .then(data => {
+        setApiData(data.data);
+      })
+      .catch(error => console.error(error));
+  }, []);
+
+  return (
+    <div style={{ textAlign: 'center', marginTop: '50px' }}>
+      <h1>React & Flask Integration</h1>
+      <p>{apiData ? apiData : "Loading data..."}</p>
+    </div>
+  );
+}
+
+export default App;
+```
+
+### 4️⃣ Menjalankan Aplikasi React
+Di terminal proyek React (`frontend/my-react-app`), jalankan perintah:
+
+```sh
+npm run dev
+```
+
+Buka browser ke `http://localhost:5173/`.
+Jika berhasil, teks **"Hello from Flask API"** akan ditampilkan di halaman React.
+![Run Flask API di frontend](images/hello_flask_api.png)
