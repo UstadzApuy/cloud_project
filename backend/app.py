@@ -1,22 +1,22 @@
+import os
 import psycopg2
 from flask import Flask,request,jsonify
 
 # Fungsi untuk koneksi ke database PostgreSQL
 def get_db_connection():
     conn = psycopg2.connect(
-        host="localhost",
-        database="test_db",
-        user="student",
-        password="123"
+        host=os.environ.get("DB_HOST", "localhost"),
+        database=os.environ.get("DB_NAME", "test_db"),
+        user=os.environ.get("DB_USER", "student"),
+        password=os.environ.get("DB_PASSWORD", "password")
     )
     return conn
-
 
 from flask_cors import CORS
 
 app = Flask(__name__)
 
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 @app.route('/')
 def home():
